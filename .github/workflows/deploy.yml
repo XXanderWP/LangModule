@@ -47,6 +47,8 @@ jobs:
 
       - name: Publish to npm (latest)
         if: steps.check_version.outputs.exists == 'false' && github.ref == 'refs/heads/main'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           npm publish --access=public
 
@@ -59,5 +61,7 @@ jobs:
     
       - name: Publish to npm (beta)
         if: steps.check_version.outputs.exists == 'false' && github.ref == 'refs/heads/beta'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           npm publish --tag beta --access=public

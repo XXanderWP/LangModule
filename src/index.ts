@@ -1,23 +1,50 @@
 export class LanguageCore<
   T extends Record<string, Record<string, string>>,
-  LangKey extends keyof T = keyof T
+  LangKey extends keyof T = keyof T,
 > {
   private readonly _languages_data: T;
   private _currentLanguage: LangKey | null = null;
 
   constructor(data: T, defaultLanguage?: keyof T) {
+    this.validateLanguageData(data)
+
+    this._languages_data = data;
+    if (defaultLanguage) {
+      if (!this.langKeys.includes(defaultLanguage as LangKey)) {
+        throw new Error(
+          `Default language ${String(defaultLanguage)} is not supported.`,
+        );
+      }
+      this._currentLanguage = defaultLanguage as LangKey;
+    } else {
+      this._currentLanguage = Object.keys(data)[0] as LangKey;
+    }
+  }
+
+  private validateLanguageData(data: T): void {
     if (Object.keys(data).length === 0) {
       throw new Error("Languages data cannot be empty.");
     }
+    const firstLangData = data[Object.keys(data)[0] as LangKey];
+    if (typeof firstLangData !== "object" || Array.isArray(firstLangData)) {
+      throw new Error("Each language data must be an object.");
+    }
 
-    this._languages_data = data;
-    if(defaultLanguage) {
-        if (!this.langKeys.includes(defaultLanguage as LangKey)) {
-            throw new Error(`Default language ${String(defaultLanguage)} is not supported.`);
-        }
-        this._currentLanguage = defaultLanguage as LangKey;
-    } else {
-        this._currentLanguage = Object.keys(data)[0] as LangKey;
+    const firstLangKeys = Object.keys(firstLangData);
+    for (const langKey in data) {
+      const langData = data[langKey];
+      if (typeof langData !== "object" || Array.isArray(langData)) {
+        throw new Error(`Language data for ${langKey} must be an object.`);
+      }
+      const langKeys = Object.keys(langData);
+      if (
+        langKeys.length !== firstLangKeys.length ||
+        !langKeys.every((key) => firstLangKeys.includes(key))
+      ) {
+        throw new Error(
+          `All languages must have the same keys. Mismatch found in ${langKey}.`,
+        );
+      }
     }
   }
 
@@ -46,9 +73,9 @@ export class LanguageCore<
   }
 
   translate<K extends keyof T[LangKey]>(
-  key: K,
-  ...args: (string | number)[]
-): string | null {
+    key: K,
+    ...args: (string | number)[]
+  ): string | null {
     if (!this._currentLanguage) return null;
 
     const langData = this._languages_data[this._currentLanguage];
@@ -61,4 +88,3 @@ export class LanguageCore<
     return res || null;
   }
 }
-

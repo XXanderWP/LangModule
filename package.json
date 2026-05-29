@@ -8,6 +8,7 @@
   },
   "scripts": {
     "build": "tsc",
+    "test:coverage": "jest --coverage",
     "test": "jest"
   },
   "author": "XXanderWP",

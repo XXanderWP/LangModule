@@ -1,5 +1,6 @@
 # Source files (we only publish dist/)
 src/
+/logo.png
 node_modules/
 tsconfig.json
 tsconfig.test.json

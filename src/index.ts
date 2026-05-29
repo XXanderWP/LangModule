@@ -88,3 +88,6 @@ export class LanguageCore<
     return res || null;
   }
 }
+
+
+export default LanguageCore;

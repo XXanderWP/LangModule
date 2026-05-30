@@ -36,7 +36,7 @@ export class LanguageCore<
    * `null` only while the class has not yet been fully initialised
    * (should not occur under normal usage).
    */
-  private _currentLanguage: LangKey | null = null;
+  private _currentLanguage: LangKey;
 
   /**
    * Creates a new `LanguageCore` instance.
@@ -124,9 +124,9 @@ export class LanguageCore<
   /**
    * Returns the key of the currently active language.
    *
-   * @returns The active language key, or `null` if no language has been set.
+   * @returns The active language key.
    */
-  get currentLanguage(): LangKey | null {
+  get currentLanguage(): LangKey {
     return this._currentLanguage;
   }
 
@@ -157,11 +157,9 @@ export class LanguageCore<
   /**
    * Returns the translation map for the currently active language.
    *
-   * @returns The `Record<string, string>` of the active language,
-   *   or `null` if no language is currently set.
+   * @returns The `Record<string, string>` of the active language.
    */
-  get currentLanguageData(): T[LangKey] | null {
-    if (!this._currentLanguage) return null;
+  get currentLanguageData(): T[LangKey] {
     return this._languages_data[this._currentLanguage];
   }
 
@@ -180,8 +178,7 @@ export class LanguageCore<
    * @param args - Zero or more values to interpolate into the translated string.
    *   Each value is coerced to a string and replaces the matching `{n}` token.
    *
-   * @returns The translated (and interpolated) string, or `null` if no language
-   *   is active or if the resolved translation is an empty string.
+   * @returns The translated (and interpolated) string, or `null` if the resolved translation is an empty string.
    *
    * @example
    * lc.translate("greeting", "Alice");       // "Hello, Alice!"
@@ -191,8 +188,6 @@ export class LanguageCore<
     key: K,
     ...args: (string | number)[]
   ): string | null {
-    if (!this._currentLanguage) return null;
-
     const langData = this._languages_data[this._currentLanguage];
     let res = langData[key] as string;
 

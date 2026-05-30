@@ -17,6 +17,7 @@ A lightweight, type-safe TypeScript module for managing multi-language translati
 - Full TypeScript generic type safety — language keys and translation keys are statically inferred
 - Runtime language switching via a simple setter
 - String interpolation with indexed placeholders (`{0}`, `{1}`, ...)
+- Language change listeners with automatic unregister support
 - Zero runtime dependencies
 
 ## Installation
@@ -78,7 +79,7 @@ Throws if `data` is empty or `defaultLanguage` is not a key of `data`.
 
 Returns the translated string for `key` in the current language, with `{0}`, `{1}`, ... placeholders replaced by the provided `args`.
 
-Returns `null` if the key does not exist or no language is set.
+Returns the key itself as a string if the translation is missing.
 
 ---
 
@@ -102,7 +103,22 @@ Returns the full translations object passed to the constructor.
 
 ### `currentLanguageData`
 
-Returns the translation dictionary for the currently active language, or `null` if none is set.
+Returns the translation dictionary for the currently active language.
+
+---
+
+### `onChangeLanguage(cb)`
+
+Registers a callback to be invoked whenever the active language changes. Returns an unregister function — call it to remove the listener.
+
+```ts
+const unregister = lang.onChangeLanguage(() => {
+  console.log("Language changed to:", lang.currentLanguage);
+});
+
+// Later, to stop listening:
+unregister();
+```
 
 ## Development
 

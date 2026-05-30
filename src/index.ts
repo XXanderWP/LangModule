@@ -23,6 +23,19 @@ export class LanguageCore<
   T extends Record<string, Record<string, string>>,
   LangKey extends keyof T = keyof T,
 > {
+  private _onChangeLanguage: ({id: number, cb: (newLang: LangKey) => void})[] = [];
+
+  /** Registers a callback to be invoked whenever the active language changes.
+   * Returns a function to unregister the callback.
+   */
+  onChangeLanguage(cb: (newLang: LangKey) => void) {
+    const id = Math.random();
+    this._onChangeLanguage.push({id, cb});
+    return () => {
+      this._onChangeLanguage = this._onChangeLanguage.filter(item => item.id !== id);
+    }
+  }
+
   /**
    * The immutable translations dataset provided at construction time.
    * Contains all language entries keyed by their language identifier.
@@ -142,7 +155,11 @@ export class LanguageCore<
     if (!this.langKeys.includes(lang)) {
       throw new Error(`Language ${String(lang)} is not supported.`);
     }
+    if(lang === this._currentLanguage) {
+      return;
+    }
     this._currentLanguage = lang;
+    this._onChangeLanguage.forEach(item => item.cb(lang));
   }
 
   /**

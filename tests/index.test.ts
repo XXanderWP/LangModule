@@ -1,4 +1,4 @@
-import { describe, it, expect } from "@jest/globals";
+import { describe, it, expect, jest } from "@jest/globals";
 import { LanguageCore } from "../src/index";
 
 describe("LangModule", () => {
@@ -74,6 +74,69 @@ describe("LangModule", () => {
     const langModule = new LanguageCore(data);
     expect(langModule.langKeys).toEqual(["en", "es"]);
   });
+ 
+  describe("onChangeLanguage", () => {
+    const data = {
+      en: { greeting: "Hello" },
+      es: { greeting: "Hola" },
+      fr: { greeting: "Bonjour" },
+    };
 
+    it("should invoke the callback when the language changes", () => {
+      const langModule = new LanguageCore(data, "en");
+      const cb = jest.fn();
+      langModule.onChangeLanguage(cb);
+      langModule.currentLanguage = "es";
+      expect(cb).toHaveBeenCalledTimes(1);
+    });
 
+    it("should not invoke the callback when the language is set to the same value", () => {
+      const langModule = new LanguageCore(data, "en");
+      const cb = jest.fn();
+      langModule.onChangeLanguage(cb);
+      langModule.currentLanguage = "en";
+      expect(cb).not.toHaveBeenCalled();
+    });
+
+    it("should stop invoking the callback after unregistering", () => {
+      const langModule = new LanguageCore(data, "en");
+      const cb = jest.fn();
+      const unregister = langModule.onChangeLanguage(cb);
+      unregister();
+      langModule.currentLanguage = "es";
+      expect(cb).not.toHaveBeenCalled();
+    });
+
+    it("should support multiple callbacks at once", () => {
+      const langModule = new LanguageCore(data, "en");
+      const cb1 = jest.fn();
+      const cb2 = jest.fn();
+      langModule.onChangeLanguage(cb1);
+      langModule.onChangeLanguage(cb2);
+      langModule.currentLanguage = "es";
+      expect(cb1).toHaveBeenCalledTimes(1);
+      expect(cb2).toHaveBeenCalledTimes(1);
+    });
+
+    it("should only unregister the specific callback, leaving others active", () => {
+      const langModule = new LanguageCore(data, "en");
+      const cb1 = jest.fn();
+      const cb2 = jest.fn();
+      const unregister1 = langModule.onChangeLanguage(cb1);
+      langModule.onChangeLanguage(cb2);
+      unregister1();
+      langModule.currentLanguage = "es";
+      expect(cb1).not.toHaveBeenCalled();
+      expect(cb2).toHaveBeenCalledTimes(1);
+    });
+
+    it("should invoke the callback on each subsequent language change", () => {
+      const langModule = new LanguageCore(data, "en");
+      const cb = jest.fn();
+      langModule.onChangeLanguage(cb);
+      langModule.currentLanguage = "es";
+      langModule.currentLanguage = "fr";
+      expect(cb).toHaveBeenCalledTimes(2);
+    });
+  });
 });

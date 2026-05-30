@@ -56,14 +56,14 @@ describe("LangModule", () => {
     expect(() => (langModule.currentLanguage = null)).toThrow("Language null is not supported.");
   });
 
-  it("should return null for translation if key does not exist", () => {
+  it("should return key for translation if key does not exist", () => {
     const data = {
       en: { greeting: "Hello" },
       es: { greeting: "Hola" },
     };
     const langModule = new LanguageCore(data);
     // @ts-ignore
-    expect(langModule.translate("farewell")).toBeNull();
+    expect(langModule.translate("farewell")).toBe("farewell");
   });
 
   it("should return the correct language keys", () => {

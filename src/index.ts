@@ -178,7 +178,7 @@ export class LanguageCore<
    * @param args - Zero or more values to interpolate into the translated string.
    *   Each value is coerced to a string and replaces the matching `{n}` token.
    *
-   * @returns The translated (and interpolated) string, or `null` if the resolved translation is an empty string.
+   * @returns The translated (and interpolated) string, or the key itself if the translation is missing.
    *
    * @example
    * lc.translate("greeting", "Alice");       // "Hello, Alice!"
@@ -187,7 +187,7 @@ export class LanguageCore<
   translate<K extends keyof T[LangKey]>(
     key: K,
     ...args: (string | number)[]
-  ): string | null {
+  ): string {
     const langData = this._languages_data[this._currentLanguage];
     let res = langData[key] as string;
 
@@ -195,7 +195,7 @@ export class LanguageCore<
       res = res.replace(new RegExp(`\\{${index}\\}`, "g"), String(arg));
     });
 
-    return res || null;
+    return res || String(key);
   }
 }
 

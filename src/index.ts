@@ -214,6 +214,33 @@ export class LanguageCore<
 
     return res || String(key);
   }
+
+  /**
+   * Installs a new language into the translations dataset.
+   *
+   * @param langKey - The key for the new language.
+   * @param langData - The translation map for the new language.
+   *
+   * @throws {Error} If the language already exists or if the translation keys
+   *   do not match the existing languages.
+   */
+  InstallNewLanguage(langKey: string, langData: Record<string, string>) {
+    if (this._languages_data[langKey as LangKey]) {
+      throw new Error(`Language ${langKey} already exists.`);
+    }
+    const firstLangData = this._languages_data[this.langKeys[0]];
+    const firstLangKeys = Object.keys(firstLangData);
+    const langKeys = Object.keys(langData);
+    if (
+      langKeys.length !== firstLangKeys.length ||
+      !langKeys.every((key) => firstLangKeys.includes(key))
+    ) {
+      throw new Error(
+        `New language must have the same keys as existing languages. Mismatch found in ${langKey}.`,
+      );
+    }
+    (this._languages_data as any)[langKey] = langData;
+  }
 }
 
 

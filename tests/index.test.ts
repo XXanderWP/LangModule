@@ -139,4 +139,59 @@ describe("LangModule", () => {
       expect(cb).toHaveBeenCalledTimes(2);
     });
   });
+
+  describe("InstallNewLanguage", () => {
+    it("should install a new language with matching keys", () => {
+      const data = {
+        en: { greeting: "Hello", farewell: "Goodbye" },
+        es: { greeting: "Hola", farewell: "Adios" },
+      };
+
+      const langModule = new LanguageCore(data, "en");
+
+      langModule.InstallNewLanguage("fr", {
+        greeting: "Bonjour",
+        farewell: "Au revoir",
+      });
+
+      expect(langModule.langKeys).toEqual(["en", "es", "fr"]);
+      // @ts-ignore runtime-added key is not part of original generic type
+      expect(langModule.languagesData.fr).toEqual({
+        greeting: "Bonjour",
+        farewell: "Au revoir",
+      });
+    });
+
+    it("should throw when installing an already existing language", () => {
+      const data = {
+        en: { greeting: "Hello" },
+        es: { greeting: "Hola" },
+      };
+
+      const langModule = new LanguageCore(data, "en");
+
+      expect(() =>
+        langModule.InstallNewLanguage("en", {
+          greeting: "Hello again",
+        }),
+      ).toThrow("Language en already exists.");
+    });
+
+    it("should throw when new language keys do not match existing keys", () => {
+      const data = {
+        en: { greeting: "Hello", farewell: "Goodbye" },
+        es: { greeting: "Hola", farewell: "Adios" },
+      };
+
+      const langModule = new LanguageCore(data, "en");
+
+      expect(() =>
+        langModule.InstallNewLanguage("fr", {
+          greeting: "Bonjour",
+        }),
+      ).toThrow(
+        "New language must have the same keys as existing languages. Mismatch found in fr.",
+      );
+    });
+  });
 });

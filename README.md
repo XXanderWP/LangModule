@@ -120,6 +120,32 @@ const unregister = lang.onChangeLanguage(() => {
 unregister();
 ```
 
+---
+
+### `InstallNewLanguage(langKey, langData)`
+
+Adds a new language dictionary to the existing translations at runtime.
+
+| Parameter  | Type                     | Description                                                                 |
+| ---------- | ------------------------ | --------------------------------------------------------------------------- |
+| `langKey`  | `string`                 | The language key to add (for example, `fr`).                               |
+| `langData` | `Record<string, string>` | Translation dictionary for the new language. Must match existing keys exactly. |
+
+Throws if:
+
+- `langKey` already exists.
+- `langData` does not contain exactly the same translation keys as existing languages.
+
+```ts
+lang.InstallNewLanguage("fr", {
+  greeting: "Bonjour, {0}!",
+  farewell: "Au revoir!",
+});
+
+lang.currentLanguage = "fr";
+lang.translate("greeting", "Alice"); // "Bonjour, Alice!"
+```
+
 ## Development
 
 **Build**
